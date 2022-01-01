@@ -7,6 +7,7 @@ from users.views import UserViewSet, get_confirmation_code, get_jwt_token
 router = DefaultRouter()
 router.register('users', UserViewSet)
 
+
 auth_patterns = [
     path('signup/', get_confirmation_code, name='get_confirmation_code'),
     path('token/', get_jwt_token, name='get_jwt_token'),
