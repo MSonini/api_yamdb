@@ -12,7 +12,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-# test
 # Application definition
 
 INSTALLED_APPS = [
@@ -26,6 +25,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_filters'
+    'djoser',
+    'api',
+    'reviews',
 ]
 
 MIDDLEWARE = [
@@ -107,6 +109,7 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
 
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -115,13 +118,22 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 5,
 }
 
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=10),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=10),
-}
-
 AUTH_USER_MODEL = 'users.User'
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_mails')
+
+# API
+'''
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+
+}
+'''
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1=),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
