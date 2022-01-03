@@ -35,3 +35,7 @@ class Comment(models.Model):
         Review, on_delete=models.CASCADE, related_name='comments')
     text = models.TextField(max_length=200)
     pub_date = models.DateTimeField(auto_now_add=True)
+
+
+class Title(models.Model):
+    pass
