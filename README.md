@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Как запустить и работать с проектом api_yamdb
 
 ## Про прложение Users и аутентификацию
@@ -11,7 +10,6 @@
     с api проекта.
 
 ## Cоздать и активировать виртуальное окружение
-=======
 # api_yamdb
 api_yamdb
 ### Как запустить проект:
@@ -64,4 +62,3 @@ for Win: python manage.py migrate
 For Unix: python3 manage.py runserver
 for Win: python manage.py runserver
 ```
->>>>>>> dev2part
