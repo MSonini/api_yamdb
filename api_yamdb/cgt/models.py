@@ -36,13 +36,13 @@ class Title(models.Model):
         validators=[MinValueValidator(-15000), max_value_year])
     category = models.ForeignKey(
         Categorie, on_delete=models.SET_NULL,
-        related_name='Категория произведения',
+        related_name='titles',
         blank=False, null=True,
         verbose_name='Категория', help_text='Выберите категорию произведения',
     )
     genre = models.ForeignKey(
         Genre, on_delete=models.SET_NULL,
-        related_name='Жанр произведения',
+        related_name='titles',
         blank=False, null=True,
         verbose_name='Жанр', help_text='Выберите жанр произведения',
     )

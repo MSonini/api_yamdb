@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'djoser',
     'api',
     'reviews',
+    'cgt',
 ]
 
 MIDDLEWARE = [
