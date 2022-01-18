@@ -2,7 +2,7 @@ from rest_framework import viewsets, pagination
 from rest_framework.generics import get_object_or_404
 
 from .serializers import ReviewSerializer, CommentSerializer
-from rest_framework.permissions import AuthorOrReadOnly
+from reviews.permissions import AuthorOrReadOnly
 from reviews.models import Review
 from cgt.models import Title
 
