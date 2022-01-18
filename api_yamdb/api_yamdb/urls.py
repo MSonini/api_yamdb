@@ -25,4 +25,6 @@ urlpatterns = [
         name='redoc'
     ),
     path('api/', include('users.urls')),
+    path('api/', include('cgt.urls')),
+    path('api/', include('api.urls')),
 ]

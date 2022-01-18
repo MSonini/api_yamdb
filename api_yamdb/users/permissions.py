@@ -11,3 +11,8 @@ class IfModerator(permissions.BasePermission):
         return (
             request.user.is_authenticated and request.user.role == 'moderator'
         )
+
+
+class ReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.method in permissions.SAFE_METHODS
