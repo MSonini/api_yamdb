@@ -39,7 +39,8 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
-class CategorieViewSet(ListModelMixin, CreateModelMixin, DestroyModelMixin, viewsets.GenericViewSet):
+class CategorieViewSet(ListModelMixin, CreateModelMixin, DestroyModelMixin,
+                       viewsets.GenericViewSet):
     queryset = Categorie.objects.all()
     serializer_class = CategorieSerializer
     permission_classes = [AdminOrReadOnly]
@@ -49,7 +50,8 @@ class CategorieViewSet(ListModelMixin, CreateModelMixin, DestroyModelMixin, view
     search_fields = ('name',)
 
 
-class GenreViewSet(ListModelMixin, CreateModelMixin, DestroyModelMixin, viewsets.GenericViewSet):
+class GenreViewSet(ListModelMixin, CreateModelMixin, DestroyModelMixin,
+                   viewsets.GenericViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = [AdminOrReadOnly]
