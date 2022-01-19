@@ -55,7 +55,12 @@ class Categorie(models.Model):
 
 class Genre(models.Model):
     name = models.TextField('Название жанра', max_length=256)
-    slug = models.SlugField('Адрес жанра', unique=True, max_length=50)
+    slug = models.SlugField(
+        'Адрес жанра',
+        unique=True,
+        blank=True,
+        null=True,
+        max_length=50)
 
     def __str__(self):
         return self.name
@@ -66,11 +71,12 @@ def current_year():
 
 
 def max_value_year(value):
-    return MaxValueValidator(current_year() + 10)(value)
+    return MaxValueValidator(current_year())(value)
 
 
 class Title(models.Model):
-    name = models.TextField('Название произведения', max_length=5000)
+    name = models.TextField('Название произведения', max_length=200)
+    description = models.TextField('Описание произведения', blank=True)
     year = models.IntegerField(
         'Год издания произведения',
         blank=True,
@@ -78,16 +84,21 @@ class Title(models.Model):
         validators=[MinValueValidator(-15000), max_value_year])
     category = models.ForeignKey(
         Categorie, on_delete=models.SET_NULL,
-        related_name='titles',
+        related_name='c_titles',
         blank=False, null=True,
         verbose_name='Категория', help_text='Выберите категорию произведения',
     )
-    genre = models.ForeignKey(
-        Genre, on_delete=models.SET_NULL,
-        related_name='titles',
-        blank=False, null=True,
-        verbose_name='Жанр', help_text='Выберите жанр произведения',
-    )
+    genre = models.ManyToManyField(
+        Genre,
+        blank=True,
+        related_name='g_titles',
+        verbose_name='Жанры',)
+    # models.ForeignKey(
+    #     Genre, on_delete=models.SET_NULL,
+    #     related_name='titles',
+    #     blank=False, null=True,
+    #     verbose_name='Жанр', help_text='Выберите жанр произведения',
+    # )
 
     def __str__(self):
         return self.name[:100]

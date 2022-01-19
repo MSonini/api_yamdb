@@ -10,7 +10,7 @@ app_name = 'reviews'
 router_v1 = routers.DefaultRouter()
 router_v1.register('categories', CategorieViewSet)
 router_v1.register('genres', GenreViewSet)
-router_v1.register('title', TitleViewSet)
+router_v1.register('titles', TitleViewSet)
 router_v1.register(
     r'titles/(?P<title_id>\d+)/reviews',
     ReviewViewSet,

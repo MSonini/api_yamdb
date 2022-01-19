@@ -7,8 +7,8 @@ from rest_framework import filters
 from .models import Review, Categorie, Genre, Title
 from .permissions import AuthorOrReadOnly, AdminOrReadOnly
 from .serializers import (CategorieSerializer, CommentSerializer,
-                          GenreSerializer, ReviewSerializer, TitleSerializer)
-
+                          GenreSerializer, ReviewSerializer, TitleSerializer,
+                          TitleSerializerGet)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -60,10 +60,14 @@ class GenreViewSet(ListModelMixin, CreateModelMixin, DestroyModelMixin, viewsets
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    serializer_class = TitleSerializer
     queryset = Title.objects.all()
-    permission_classes = [AuthorOrReadOnly]
+    permission_classes = [AdminOrReadOnly]
     pagination_class = pagination.LimitOffsetPagination
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name', 'year', 'genre__slug', 'category__slug',)
 
-    # def perform_create(self, serializer):
-    #     serializer.save(author=self.request.user)
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return TitleSerializerGet
+        else:
+            return TitleSerializer
