@@ -3,8 +3,7 @@ from rest_framework.generics import get_object_or_404
 
 from .serializers import ReviewSerializer, CommentSerializer
 from .permissions import AuthorOrReadOnly
-from reviews.models import Review
-from cgt.models import Title
+from .models import Review, Title
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
