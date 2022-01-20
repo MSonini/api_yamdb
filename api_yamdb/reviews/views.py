@@ -65,8 +65,25 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     permission_classes = [AdminOrReadOnly]
     pagination_class = pagination.LimitOffsetPagination
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name', 'year', 'genre__slug', 'category__slug',)
+    # filter_backends = (filters.SearchFilter,)
+    # search_fields = ('name', 'year', 'genre__slug', 'category__slug',)
+
+    def get_queryset(self):
+        queryset = Title.objects.all()
+        # Добыть параметр color из GET-запроса
+        name = self.request.query_params.get('name')
+        if name is not None:
+            queryset = queryset.filter(name__contains=name)
+        year = self.request.query_params.get('year')
+        if year is not None:
+            queryset = queryset.filter(year=year)
+        genre = self.request.query_params.get('genre')
+        if genre is not None:
+            queryset = queryset.filter(genre__slug=genre)
+        category = self.request.query_params.get('category')
+        if category is not None:
+            queryset = queryset.filter(category__slug=category)
+        return queryset
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
