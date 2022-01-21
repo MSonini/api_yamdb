@@ -1,12 +1,12 @@
 from rest_framework import permissions
 
 
-class IfAdmin(permissions.BasePermission):
+class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.role == 'admin'
 
 
-class IfModerator(permissions.BasePermission):
+class IsModerator(permissions.BasePermission):
     def has_permission(self, request, view):
         return (
             request.user.is_authenticated and request.user.role == 'moderator'

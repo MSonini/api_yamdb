@@ -7,37 +7,17 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 User = get_user_model()
 
 SCORES = [
-    ('1', 1),
-    ('2', 2),
-    ('3', 3),
-    ('4', 4),
-    ('5', 5),
-    ('6', 6),
-    ('7', 7),
-    ('8', 8),
-    ('9', 9),
-    ('10', 10),
+    (1, 1),
+    (2, 2),
+    (3, 3),
+    (4, 4),
+    (5, 5),
+    (6, 6),
+    (7, 7),
+    (8, 8),
+    (9, 9),
+    (10, 10),
 ]
-
-
-class Review(models.Model):
-    text = models.TextField(max_length=500)
-    author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='reviews')
-    score = models.SmallIntegerField(choices=SCORES)
-    pub_date = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.text
-
-
-class Comment(models.Model):
-    author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='comments')
-    review = models.ForeignKey(
-        Review, on_delete=models.CASCADE, related_name='comments')
-    text = models.TextField(max_length=200)
-    pub_date = models.DateTimeField(auto_now_add=True)
 
 
 class Categorie(models.Model):
@@ -93,6 +73,8 @@ class Title(models.Model):
         blank=True,
         related_name='g_titles',
         verbose_name='Жанры',)
+    rating = models.IntegerField(default=0)
+
     # models.ForeignKey(
     #     Genre, on_delete=models.SET_NULL,
     #     related_name='titles',
@@ -102,3 +84,31 @@ class Title(models.Model):
 
     def __str__(self):
         return self.name[:100]
+
+
+class Review(models.Model):
+    text = models.TextField(max_length=500)
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='reviews')
+    score = models.SmallIntegerField(choices=SCORES)
+    pub_date = models.DateTimeField(auto_now_add=True)
+    title = models.ForeignKey(
+        Title, on_delete=models.CASCADE, related_name='reviews')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'title'], name='unique_review'),
+        ]
+
+    def __str__(self):
+        return self.text[:100]
+
+
+class Comment(models.Model):
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='comments')
+    review = models.ForeignKey(
+        Review, on_delete=models.CASCADE, related_name='comments')
+    text = models.TextField(max_length=200)
+    pub_date = models.DateTimeField(auto_now_add=True)

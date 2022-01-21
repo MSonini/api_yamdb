@@ -1,4 +1,7 @@
+from django.db.models import Avg
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+
 from reviews.models import Review, Comment, Categorie, Genre, Title
 
 
@@ -9,16 +12,6 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'text', 'author', 'pub_date')
-
-
-class ReviewSerializer(serializers.ModelSerializer):
-    comment = CommentSerializer(many=True, required=False)
-    author = serializers.StringRelatedField(
-        read_only=True, default=serializers.CurrentUserDefault())
-
-    class Meta:
-        model = Review
-        fields = ('id', 'text', 'author', 'score', 'pub_date')
 
 
 class CategorieSerializer(serializers.ModelSerializer):
@@ -43,16 +36,47 @@ class TitleSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(),
         many=True,
     )
+    rating = serializers.SerializerMethodField()
 
     class Meta:
-        fields = ('id', 'name', 'year', 'category', 'genre', 'description', )
+        fields = ('id', 'name', 'year', 'category',
+                  'genre', 'description', 'rating',)
         model = Title
+
+    def get_rating(self, obj):
+        return obj.reviews.aggregate(Avg('score'))['score__avg']
 
 
 class TitleSerializerGet(serializers.ModelSerializer):
     category = CategorieSerializer()
     genre = GenreSerializer(many=True)
+    rating = serializers.SerializerMethodField()
 
     class Meta:
-        fields = ('id', 'name', 'year', 'category', 'genre', 'description', )
+        fields = ('id', 'name', 'year', 'category',
+                  'genre', 'description', 'rating')
         model = Title
+
+    def get_rating(self, obj):
+        return obj.reviews.aggregate(Avg('score'))['score__avg']
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField(
+        read_only=True, default=serializers.CurrentUserDefault())
+    title = TitleSerializer(required=False)
+
+    class Meta:
+        model = Review
+        fields = ('id', 'author', 'title', 'text', 'score', 'pub_date')
+
+    def validate(self, data):
+        request = self.context.get("request")
+        author = request.user
+        title_id = self.context['request'].parser_context['kwargs']['title_id']
+        title = get_object_or_404(Title, id=title_id)
+        if (Review.objects.filter(author=author, title=title).exists()
+           and request.method == 'POST'):
+            raise serializers.ValidationError(
+                'You alredy have review on this title.')
+        return super().validate(data)

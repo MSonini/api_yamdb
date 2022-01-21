@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
-from .permissions import IfAdmin
+from .permissions import IsAdmin
 from .serializers import (ConfirmationCodeSerializer, UserEmailSerializer,
                           UserSerializer)
 
@@ -59,7 +59,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = "username"
-    permission_classes = [IfAdmin | IsAdminUser]
+    permission_classes = [IsAdmin | IsAdminUser]
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
     pagination_class = PageNumberPagination
