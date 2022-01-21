@@ -75,7 +75,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'author', 'title', 'text', 'score', 'pub_date')
 
     def validate(self, data):
-        request = self.context.get("request")
+        request = self.context.get('request')
         author = request.user
         title_id = self.context['request'].parser_context['kwargs']['title_id']
         title = get_object_or_404(Title, id=title_id)
@@ -93,7 +93,7 @@ class UserSerializer(serializers.ModelSerializer):
         validators=[
             UniqueValidator(
                 queryset=User.objects.all(),
-                message="Пользователь с таким email уже существует!")
+                message='Пользователь с таким email уже существует!')
         ]
     )
     username = serializers.CharField(
@@ -101,7 +101,7 @@ class UserSerializer(serializers.ModelSerializer):
         validators=[
             UniqueValidator(
                 queryset=User.objects.all(),
-                message="Пользователь с таким username уже существует!"
+                message='Пользователь с таким username уже существует!'
             )
         ]
     )
@@ -119,7 +119,7 @@ class UserEmailSerializer(serializers.Serializer):
         validators=[
             UniqueValidator(
                 queryset=User.objects.all(),
-                message="Пользователь с таким email уже существует!")
+                message='Пользователь с таким email уже существует!')
         ]
     )
     username = serializers.CharField(
@@ -127,7 +127,7 @@ class UserEmailSerializer(serializers.Serializer):
         validators=[
             UniqueValidator(
                 queryset=User.objects.all(),
-                message="Пользователь с таким username уже существует!"
+                message='Пользователь с таким username уже существует!'
             )
         ]
     )

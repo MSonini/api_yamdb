@@ -79,12 +79,9 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     permission_classes = [AdminOrReadOnly]
     pagination_class = pagination.LimitOffsetPagination
-    # filter_backends = (filters.SearchFilter,)
-    # search_fields = ('name', 'year', 'genre__slug', 'category__slug',)
 
     def get_queryset(self):
         queryset = Title.objects.all()
-        # Добыть параметр color из GET-запроса
         name = self.request.query_params.get('name')
         if name is not None:
             queryset = queryset.filter(name__contains=name)
@@ -150,7 +147,7 @@ def get_jwt_token(request):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    lookup_field = "username"
+    lookup_field = 'username'
     permission_classes = [Admin | IsAdminUser]
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
