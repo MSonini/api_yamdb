@@ -52,7 +52,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializerGet(serializers.ModelSerializer):
-    category = CategorieSerializer()
+    category = CategorieSerializer(allow_null=False)
     genre = GenreSerializer(many=True, required=True)
     rating = serializers.SerializerMethodField()
 
