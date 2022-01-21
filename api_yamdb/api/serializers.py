@@ -1,8 +1,12 @@
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
 from reviews.models import Review, Comment, Categorie, Genre, Title
+
+User = get_user_model()
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -49,7 +53,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
 class TitleSerializerGet(serializers.ModelSerializer):
     category = CategorieSerializer()
-    genre = GenreSerializer(many=True)
+    genre = GenreSerializer(many=True, required=True)
     rating = serializers.SerializerMethodField()
 
     class Meta:
@@ -80,3 +84,55 @@ class ReviewSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'You alredy have review on this title.')
         return super().validate(data)
+
+
+class UserSerializer(serializers.ModelSerializer):
+
+    email = serializers.EmailField(
+        required=True,
+        validators=[
+            UniqueValidator(
+                queryset=User.objects.all(),
+                message="Пользователь с таким email уже существует!")
+        ]
+    )
+    username = serializers.CharField(
+        required=True,
+        validators=[
+            UniqueValidator(
+                queryset=User.objects.all(),
+                message="Пользователь с таким username уже существует!"
+            )
+        ]
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            'first_name', 'last_name', 'username', 'bio', 'email', 'role'
+        )
+
+
+class UserEmailSerializer(serializers.Serializer):
+    email = serializers.EmailField(
+        required=True,
+        validators=[
+            UniqueValidator(
+                queryset=User.objects.all(),
+                message="Пользователь с таким email уже существует!")
+        ]
+    )
+    username = serializers.CharField(
+        required=True,
+        validators=[
+            UniqueValidator(
+                queryset=User.objects.all(),
+                message="Пользователь с таким username уже существует!"
+            )
+        ]
+    )
+
+
+class ConfirmationCodeSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    confirmation_code = serializers.CharField(required=True)

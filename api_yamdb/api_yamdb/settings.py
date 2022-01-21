@@ -15,6 +15,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'api',
     'users',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -25,7 +26,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'djoser',
-    'api',
     'reviews',
 ]
 
