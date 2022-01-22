@@ -25,13 +25,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'djoser',
-<<<<<<< HEAD
-    'api',
     'reviews',
-    'cgt'
-=======
-    'reviews',
->>>>>>> master
 ]
 
 MIDDLEWARE = [
