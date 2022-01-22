@@ -1,28 +1,23 @@
 from rest_framework import permissions
 
 
-class AuthorOrReadOnly(permissions.BasePermission):
+class ReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
-        return (
-            request.method in permissions.SAFE_METHODS
-            or request.user.is_authenticated
-        )
+        return request.method in permissions.SAFE_METHODS
 
     def has_object_permission(self, request, view, obj):
-        return (obj.author == request.user
-                or request.method in permissions.SAFE_METHODS)
+        return request.method in permissions.SAFE_METHODS
 
 
-class AdminOrReadOnly(permissions.BasePermission):
+class IsAuthor(permissions.BasePermission):
     def has_permission(self, request, view):
-        return (
-            request.method in permissions.SAFE_METHODS
-            or request.user.is_authenticated
-            and request.user.is_admin
-        )
+        return request.user.is_authenticated
+
+    def has_object_permission(self, request, view, obj):
+        return obj.author == request.user
 
 
-class Admin(permissions.BasePermission):
+class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.is_admin
 
@@ -32,7 +27,7 @@ class Admin(permissions.BasePermission):
         )
 
 
-class Moderator(permissions.BasePermission):
+class IsModerator(permissions.BasePermission):
     def has_permission(self, request, view):
         return (
             request.user.is_authenticated and request.user.is_moderator
