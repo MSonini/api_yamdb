@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
-import datetime
-from django.core.validators import MaxValueValidator, MinValueValidator
+
+from .validators import range_year_validate
 
 
 User = get_user_model()
@@ -25,8 +25,6 @@ class Categorie(models.Model):
     slug = models.SlugField(
         'Адрес категории',
         unique=True,
-        blank=True,
-        null=True,
         max_length=50,)
 
     def __str__(self):
@@ -38,20 +36,10 @@ class Genre(models.Model):
     slug = models.SlugField(
         'Адрес жанра',
         unique=True,
-        blank=True,
-        null=True,
         max_length=50)
 
     def __str__(self):
         return self.name
-
-
-def current_year():
-    return datetime.date.today().year
-
-
-def max_value_year(value):
-    return MaxValueValidator(current_year())(value)
 
 
 class Title(models.Model):
@@ -61,7 +49,7 @@ class Title(models.Model):
         'Год издания произведения',
         blank=True,
         null=False,
-        validators=[MinValueValidator(-15000), max_value_year])
+        validators=[range_year_validate, ])
     category = models.ForeignKey(
         Categorie, on_delete=models.SET_NULL,
         related_name='c_titles',
@@ -74,13 +62,6 @@ class Title(models.Model):
         related_name='g_titles',
         verbose_name='Жанры',)
     rating = models.IntegerField(default=0)
-
-    # models.ForeignKey(
-    #     Genre, on_delete=models.SET_NULL,
-    #     related_name='titles',
-    #     blank=False, null=True,
-    #     verbose_name='Жанр', help_text='Выберите жанр произведения',
-    # )
 
     def __str__(self):
         return self.name[:100]
