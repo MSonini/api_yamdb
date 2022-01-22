@@ -3,7 +3,6 @@ from django.db import models
 
 from .validators import range_year_validate
 
-
 User = get_user_model()
 
 SCORES = [
