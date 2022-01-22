@@ -10,4 +10,4 @@ class User(AbstractUser):
     )
     email = models.EmailField(unique=True)
     bio = models.TextField(blank=True)
-    role = models.CharField(max_length=25, choices=ROLE, default='user')
+    role = models.CharField(max_length=50, choices=ROLE, default='user')
