@@ -3,6 +3,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Avg
 from rest_framework import filters, pagination, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
@@ -10,8 +11,8 @@ from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-from reviews.models import Categorie, Comment, Genre, Review, Title
 
+from reviews.models import Categorie, Comment, Genre, Review, Title
 from .filters import TitleFilter
 from .permissions import IsAdmin, IsAuthor, IsModerator, ReadOnly
 from .serializers import (CategorieSerializer, CommentSerializer,
@@ -19,7 +20,6 @@ from .serializers import (CategorieSerializer, CommentSerializer,
                           TitleSerializerGet, ConfirmationCodeSerializer,
                           UserEmailSerializer, UserSerializer,
                           SimpleUserSerializer)
-
 
 User = get_user_model()
 
@@ -31,8 +31,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
-        reviews = Review.objects.filter(title__id=title_id)
-        return reviews
+        # При использовании get_list_or_404 появляются ошибки 404,
+        # которые не предусмотрены в тестах
+        return Review.objects.filter(title__id=title_id)
 
     def perform_create(self, serializer):
         title_id = self.kwargs.get('title_id')
@@ -47,8 +48,8 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
-        comments = Comment.objects.filter(review__id=review_id)
-        return comments
+        # Аналогично ситуации в ReviewViewSet
+        return Comment.objects.filter(review__id=review_id)
 
     def perform_create(self, serializer):
         review_id = self.kwargs.get('review_id')
@@ -79,7 +80,7 @@ class GenreViewSet(ListModelMixin, CreateModelMixin, DestroyModelMixin,
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.annotate(rating=Avg('reviews__score'))
     permission_classes = [ReadOnly | IsAdmin]
     pagination_class = pagination.LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
@@ -103,7 +104,7 @@ def get_confirmation_code(request):
     send_mail(
         user,
         message,
-        'aдминистрация_yamdb@mail.ru',
+        'noreply_yamdb@mail.ru',
         [email],
         fail_silently=False
     )
@@ -140,8 +141,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.request.user.is_admin:
             return UserSerializer
-        else:
-            return SimpleUserSerializer
+        return SimpleUserSerializer
 
     @action(
         methods=['patch', 'get'],

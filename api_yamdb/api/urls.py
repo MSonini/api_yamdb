@@ -7,7 +7,7 @@ from .views import (ReviewViewSet, CommentViewSet,
                     UserViewSet, get_confirmation_code, get_jwt_token)
 
 
-app_name = 'reviews'
+app_name = 'api'
 
 router_v1 = routers.DefaultRouter()
 router_v1.register('users', UserViewSet)

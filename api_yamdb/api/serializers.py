@@ -1,4 +1,3 @@
-from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
@@ -40,29 +39,23 @@ class TitleSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(),
         many=True,
     )
-    rating = serializers.SerializerMethodField()
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         fields = ('id', 'name', 'year', 'category',
                   'genre', 'description', 'rating',)
         model = Title
 
-    def get_rating(self, obj):
-        return obj.reviews.aggregate(Avg('score'))['score__avg']
-
 
 class TitleSerializerGet(serializers.ModelSerializer):
-    category = CategorieSerializer(allow_null=False)
+    category = CategorieSerializer()
     genre = GenreSerializer(many=True, required=True)
-    rating = serializers.SerializerMethodField()
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         fields = ('id', 'name', 'year', 'category',
                   'genre', 'description', 'rating')
         model = Title
-
-    def get_rating(self, obj):
-        return obj.reviews.aggregate(Avg('score'))['score__avg']
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -82,7 +75,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         if (Review.objects.filter(author=author, title=title).exists()
            and request.method == 'POST'):
             raise serializers.ValidationError(
-                'You alredy have review on this title.')
+                'У вас уже есть отзыв на это произведение.')
         return super().validate(data)
 
 

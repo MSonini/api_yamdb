@@ -1,22 +1,10 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 from .validators import range_year_validate
 
 User = get_user_model()
-
-SCORES = [
-    (1, 1),
-    (2, 2),
-    (3, 3),
-    (4, 4),
-    (5, 5),
-    (6, 6),
-    (7, 7),
-    (8, 8),
-    (9, 9),
-    (10, 10),
-]
 
 
 class Categorie(models.Model):
@@ -60,20 +48,22 @@ class Title(models.Model):
         blank=True,
         related_name='g_titles',
         verbose_name='Жанры',)
-    rating = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name[:100]
 
 
 class Review(models.Model):
-    text = models.TextField(max_length=500)
+    text = models.TextField('Текст ревью', max_length=500)
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='reviews')
-    score = models.SmallIntegerField(choices=SCORES)
-    pub_date = models.DateTimeField(auto_now_add=True)
+        User, on_delete=models.CASCADE,
+        related_name='reviews', verbose_name='Автор',)
+    score = models.SmallIntegerField(
+        'Оценка', validators=[MaxValueValidator(10), MinValueValidator(0)])
+    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
     title = models.ForeignKey(
-        Title, on_delete=models.CASCADE, related_name='reviews')
+        Title, on_delete=models.CASCADE,
+        related_name='reviews', verbose_name='Произведение',)
 
     class Meta:
         constraints = [
@@ -87,8 +77,10 @@ class Review(models.Model):
 
 class Comment(models.Model):
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='comments')
+        User, on_delete=models.CASCADE,
+        related_name='comments', verbose_name='Автор')
     review = models.ForeignKey(
-        Review, on_delete=models.CASCADE, related_name='comments')
-    text = models.TextField(max_length=200)
-    pub_date = models.DateTimeField(auto_now_add=True)
+        Review, on_delete=models.CASCADE,
+        related_name='comments', verbose_name='Отзыв')
+    text = models.TextField('Текст комментария', max_length=200)
+    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
