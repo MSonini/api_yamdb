@@ -15,10 +15,11 @@ from reviews.models import Categorie, Comment, Genre, Review, Title
 from .filters import TitleFilter
 from .permissions import IsAdmin, IsAuthor, IsModerator, ReadOnly
 from .serializers import (CategorieSerializer, CommentSerializer,
-                          ConfirmationCodeSerializer, GenreSerializer,
-                          ReviewSerializer, TitleSerializer,
-                          TitleSerializerGet, UserEmailSerializer,
-                          UserSerializer)
+                          GenreSerializer, ReviewSerializer, TitleSerializer,
+                          TitleSerializerGet, ConfirmationCodeSerializer,
+                          UserEmailSerializer, UserSerializer,
+                          SimpleUserSerializer)
+
 
 User = get_user_model()
 
@@ -93,11 +94,8 @@ class TitleViewSet(viewsets.ModelViewSet):
 @api_view(['POST'])
 def get_confirmation_code(request):
     serializer = UserEmailSerializer(data=request.data)
-
     serializer.is_valid(raise_exception=True)
     username = serializer.validated_data.get('username')
-    if username == 'me':
-        return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
     email = serializer.validated_data.get('email')
     user, created = User.objects.get_or_create(username=username, email=email)
     confirmation_code = default_token_generator.make_token(user)
@@ -105,7 +103,7 @@ def get_confirmation_code(request):
     send_mail(
         user,
         message,
-        email,
+        'aдминистрация_yamdb@mail.ru',
         [email],
         fail_silently=False
     )
@@ -133,12 +131,17 @@ def get_jwt_token(request):
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
     lookup_field = 'username'
     permission_classes = [IsAdmin | IsAdminUser]
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
     pagination_class = pagination.PageNumberPagination
+
+    def get_serializer_class(self):
+        if self.request.user.is_admin:
+            return UserSerializer
+        else:
+            return SimpleUserSerializer
 
     @action(
         methods=['patch', 'get'],
@@ -151,8 +154,6 @@ class UserViewSet(viewsets.ModelViewSet):
         user = self.request.user
         serializer = self.get_serializer(user)
         if self.request.method == 'PATCH':
-            if user.role == 'user':
-                setattr(UserSerializer.Meta, 'read_only_fields', ('role',))
             serializer = self.get_serializer(
                 user,
                 data=request.data,

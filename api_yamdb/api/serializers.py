@@ -87,7 +87,6 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-
     email = serializers.EmailField(
         required=True,
         validators=[
@@ -132,7 +131,41 @@ class UserEmailSerializer(serializers.Serializer):
         ]
     )
 
+    def validate(self, data):
+        if data['username'] == 'me':
+            raise serializers.ValidationError(
+                "Нельзя создать пользователя с указанным именем."
+            )
+        return data
+
 
 class ConfirmationCodeSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     confirmation_code = serializers.CharField(required=True)
+
+
+class SimpleUserSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(
+        required=True,
+        validators=[
+            UniqueValidator(
+                queryset=User.objects.all(),
+                message='Пользователь с таким email уже существует!')
+        ]
+    )
+    username = serializers.CharField(
+        required=True,
+        validators=[
+            UniqueValidator(
+                queryset=User.objects.all(),
+                message='Пользователь с таким username уже существует!'
+            )
+        ]
+    )
+
+    class Meta:
+        model = User
+        read_only_fields = ('role',)
+        fields = (
+            'first_name', 'last_name', 'username', 'bio', 'email', 'role'
+        )

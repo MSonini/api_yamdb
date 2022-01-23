@@ -23,7 +23,6 @@ router_v1.register(
     CommentViewSet,
     basename='comments'
 )
-
 auth_patterns = [
     path('signup/', get_confirmation_code, name='get_confirmation_code'),
     path('token/', get_jwt_token, name='get_jwt_token'),
