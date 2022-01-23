@@ -12,6 +12,8 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from api_yamdb import settings
+
 from reviews.models import Categorie, Comment, Genre, Review, Title
 from .filters import TitleFilter
 from .permissions import IsAdmin, IsAuthor, IsModerator, ReadOnly
@@ -98,13 +100,14 @@ def get_confirmation_code(request):
     serializer.is_valid(raise_exception=True)
     username = serializer.validated_data.get('username')
     email = serializer.validated_data.get('email')
+    sending_email = settings.DEFAULT_FROM_EMAIL
     user, created = User.objects.get_or_create(username=username, email=email)
     confirmation_code = default_token_generator.make_token(user)
     message = f'Код подтверждения: {confirmation_code}'
     send_mail(
         user,
         message,
-        'noreply_yamdb@mail.ru',
+        sending_email,
         [email],
         fail_silently=False
     )

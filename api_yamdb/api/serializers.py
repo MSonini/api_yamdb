@@ -137,25 +137,7 @@ class ConfirmationCodeSerializer(serializers.Serializer):
     confirmation_code = serializers.CharField(required=True)
 
 
-class SimpleUserSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(
-        required=True,
-        validators=[
-            UniqueValidator(
-                queryset=User.objects.all(),
-                message='Пользователь с таким email уже существует!')
-        ]
-    )
-    username = serializers.CharField(
-        required=True,
-        validators=[
-            UniqueValidator(
-                queryset=User.objects.all(),
-                message='Пользователь с таким username уже существует!'
-            )
-        ]
-    )
-
+class SimpleUserSerializer(UserSerializer):
     class Meta:
         model = User
         read_only_fields = ('role',)
