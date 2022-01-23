@@ -8,9 +8,9 @@ MODERATOR_ROLE = 'moderator'
 
 class User(AbstractUser):
     ROLE = (
-        ('user', USER_ROLE),
-        ('admin', ADMIN_ROLE),
-        ('moderator', MODERATOR_ROLE),
+        (USER_ROLE, 'user'),
+        (ADMIN_ROLE, 'admin'),
+        (MODERATOR_ROLE, 'moderator'),
     )
     email = models.EmailField(unique=True)
     bio = models.TextField(blank=True)
