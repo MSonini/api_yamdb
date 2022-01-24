@@ -12,9 +12,9 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api_yamdb import settings
+from api_yamdb.settings import DEFAULT_FROM_EMAIL
 
-from reviews.models import Categorie, Comment, Genre, Review, Title
+from reviews.models import Categorie, Genre, Review, Title
 from .filters import TitleFilter
 from .permissions import IsAdmin, IsAuthor, IsModerator, ReadOnly
 from .serializers import (CategorieSerializer, CommentSerializer,
@@ -33,9 +33,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
-        # При использовании get_list_or_404 появляются ошибки 404,
-        # которые не предусмотрены в тестах
-        return Review.objects.filter(title__id=title_id)
+        title = get_object_or_404(Title, id=title_id)
+        return title.reviews.all()
 
     def perform_create(self, serializer):
         title_id = self.kwargs.get('title_id')
@@ -50,8 +49,8 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
-        # Аналогично ситуации в ReviewViewSet
-        return Comment.objects.filter(review__id=review_id)
+        review = get_object_or_404(Review, id=review_id)
+        return review.comments.all()
 
     def perform_create(self, serializer):
         review_id = self.kwargs.get('review_id')
@@ -100,7 +99,7 @@ def get_confirmation_code(request):
     serializer.is_valid(raise_exception=True)
     username = serializer.validated_data.get('username')
     email = serializer.validated_data.get('email')
-    sending_email = settings.DEFAULT_FROM_EMAIL
+    sending_email = DEFAULT_FROM_EMAIL
     user, created = User.objects.get_or_create(username=username, email=email)
     confirmation_code = default_token_generator.make_token(user)
     message = f'Код подтверждения: {confirmation_code}'
