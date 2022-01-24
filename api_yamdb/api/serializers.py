@@ -1,9 +1,9 @@
-from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from reviews.models import Review, Comment, Categorie, Genre, Title
+from reviews.models import Categorie, Comment, Genre, Review, Title
 
 User = get_user_model()
 

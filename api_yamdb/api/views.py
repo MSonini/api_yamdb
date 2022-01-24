@@ -1,9 +1,10 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Avg
 from rest_framework import filters, pagination, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
@@ -12,16 +13,14 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api_yamdb.settings import DEFAULT_FROM_EMAIL
-
 from reviews.models import Categorie, Genre, Review, Title
 from .filters import TitleFilter
 from .permissions import IsAdmin, IsAuthor, IsModerator, ReadOnly
 from .serializers import (CategorieSerializer, CommentSerializer,
-                          GenreSerializer, ReviewSerializer, TitleSerializer,
-                          TitleSerializerGet, ConfirmationCodeSerializer,
-                          UserEmailSerializer, UserSerializer,
-                          SimpleUserSerializer)
+                          ConfirmationCodeSerializer, GenreSerializer,
+                          ReviewSerializer, SimpleUserSerializer,
+                          TitleSerializer, TitleSerializerGet,
+                          UserEmailSerializer, UserSerializer)
 
 User = get_user_model()
 
@@ -99,7 +98,7 @@ def get_confirmation_code(request):
     serializer.is_valid(raise_exception=True)
     username = serializer.validated_data.get('username')
     email = serializer.validated_data.get('email')
-    sending_email = DEFAULT_FROM_EMAIL
+    sending_email = settings.DEFAULT_FROM_EMAIL
     user, created = User.objects.get_or_create(username=username, email=email)
     confirmation_code = default_token_generator.make_token(user)
     message = f'Код подтверждения: {confirmation_code}'
